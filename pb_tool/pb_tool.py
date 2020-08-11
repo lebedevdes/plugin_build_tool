@@ -79,7 +79,7 @@ def cli():
 def __version():
     """ return the current version and date released """
     # TODO update this with each release
-    return ("3.0.8", "2019-11-19")
+    return ("3.1.0", "2019-11-23")
 
 
 def get_install_files(cfg):
@@ -160,7 +160,7 @@ def deploy_files(config_file, plugin_path, user_profile, confirm=True, quick=Fal
 
             if proceed:
                 # clean the deployment
-                clean_deployment(False, config_file, plugin_dir)
+                clean_deployment(False, config_file, user_profile, plugin_dir)
                 click.secho("Deploying to {0}".format(plugin_dir), fg='green')
                 # compile to make sure everything is fresh
                 click.secho('Compiling to make sure install is clean',
@@ -240,12 +240,12 @@ def install_files(plugin_dir, cfg):
             "plugin before deploying may also help.")
 
 
-def clean_deployment(ask_first=True, config='pb_tool.cfg', plugin_dir=None):
+def clean_deployment(ask_first=True, config='pb_tool.cfg', user_profile='default', plugin_dir=None):
     """ Remove the deployed plugin from the .qgis2/python/plugins directory
     """
     if not plugin_dir:
         name = get_config(config).get('plugin', 'name')
-        plugin_dir = os.path.join(get_plugin_directory(), name)
+        plugin_dir = os.path.join(get_plugin_directory(user_profile, config), name)
     if ask_first:
         proceed = click.confirm(
             'Delete the deployed plugin from {0}?'.format(plugin_dir))
@@ -292,10 +292,13 @@ def clean_docs():
 @click.option('--config',
               default='pb_tool.cfg',
               help='Name of the config file to use if other than pb_tool.cfg')
-def dclean(config):
+@click.option('--user-profile', '-u',
+              default=None,
+              help='Specify the QGIS user profile to use for deployment. Ignored if -p is set or plugin_path is specified in pb_tool.cfg')
+def dclean(config='pb_tool.cfg', user_profile='default'):
     """ Remove the deployed plugin from the deployment directory
     """
-    clean_deployment(True, config)
+    clean_deployment(True, config, user_profile)
 
 
 @cli.command()
@@ -1020,7 +1023,7 @@ def copy(source, destination):
             print('Directory not copied. Error: %s' % e)
 
 
-def get_plugin_directory(user_profile=None, config='pb_tool.cfg'):
+def get_plugin_directory(user_profile='default', config='pb_tool.cfg'):
     """ Get the plugin directory, first checking to see if it's configured in pb_tool.cfg"""
     plugin_dir = get_config(config).get('plugin', 'plugin_path', fallback=None)
 
