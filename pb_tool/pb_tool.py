@@ -966,7 +966,7 @@ def compile_files(cfg):
                 output = "{0}.py".format(base)
                 if file_changed(ui, output):
                     print("Compiling {0} to {1}".format(ui, output))
-                    subprocess.check_call([pyuic5, '-o', output, ui])
+                    subprocess.check_call([pyuic5, '--from-imports', '-o', output, ui])
                     ui_count += 1
                 else:
                     print("Skipping {0} (unchanged)".format(ui))
@@ -987,7 +987,7 @@ def compile_files(cfg):
         for res in res_files:
             if os.path.exists(res):
                 (base, ext) = os.path.splitext(res)
-                output = "{0}.py".format(base)
+                output = "{0}_rc.py".format(base)
                 if file_changed(res, output):
                     print("Compiling {0} to {1}".format(res, output))
                     subprocess.check_call([pyrcc5, '-o', output, res])
