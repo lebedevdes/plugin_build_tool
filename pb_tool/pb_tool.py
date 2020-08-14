@@ -940,8 +940,8 @@ def compiled_resource(cfg):
         compiled = []
         for res in res_files:
             (base, ext) = os.path.splitext(res)
-            compiled.append('{0}.py'.format(base))
-        #print "Compiled resource files: {}".format(compiled)
+            compiled.append('{0}_rc.py'.format(base))
+        # print("Compiled resource files: {}".format(compiled))
         return compiled
     except configparser.NoSectionError as oops:
         print(oops.message)
